@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1>Sample Page (POC)</h1>
+    <form action="/submit_get" enctype="multipart/form-data" method="POST">
+      <label for="subject">Subject:</label>
+      <input type="text" id="subject" name="subject"><br><br>
+      <label for="content">Contents:</label><br>
+      <textarea id="content" name="content" rows="4" cols="50"></textarea>
+      <br>
+      <input type="file" id="file" name="file">
+      <br>
+      <input type="submit" value="Submit">
+    </form>
+    <button id="submit_json">Click to submit</button>
+    <script> 
+        document.getElementById("submit_json").addEventListener("click", (ev) => {
+            const submitData = new FormData();
+            const request = JSON.stringify({
+                subject : document.getElementById("subject").value,
+                content : document.getElementById("content").value
+            });
+            submitData.append("request", new Blob([request], { type: 'application/json' }));
+            fetch("/submit", { method: "POST", body: submitData, redirect: "follow" });
+        });
+    </script>
+</body>
+</html>
