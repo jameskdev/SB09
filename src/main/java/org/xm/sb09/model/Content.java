@@ -12,12 +12,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 public class Content {
@@ -26,8 +28,10 @@ public class Content {
     @Id
     private Long id;
     @Getter
+    @Setter
     private String subject;
     @Getter
+    @Setter
     @Lob
     private String content;
     @Getter
@@ -35,6 +39,8 @@ public class Content {
     private Date submitTime;
     @OneToMany(mappedBy = "content", cascade = CascadeType.ALL)
     private List<ContentAttachment> uploadedFiles = new ArrayList<>();
+    @ManyToOne
+    private Account uploadedBy;
 
     protected Content() {
         this.subject = "";
@@ -44,6 +50,14 @@ public class Content {
     @PrePersist
     public void setSubmitTime() {
         submitTime = new Date();
+    }
+
+    public Account getUploadedBy() {
+        return this.uploadedBy;
+    }
+
+    public void setUploadedBy(Account uploadedBy) {
+        this.uploadedBy = uploadedBy;
     }
 
     @Builder

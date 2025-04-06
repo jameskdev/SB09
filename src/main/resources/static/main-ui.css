@@ -1,0 +1,78 @@
+/*
+ * Copyright 2002-2024 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* General layout */
+body {
+    font-family: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #eee;
+    padding: 40px 0;
+    margin: 0;
+    line-height: 1.5;
+}
+
+h1 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 2rem;
+    font-weight: 500;
+    line-height: 2rem;
+}
+
+.content {
+    margin-right: auto;
+    margin-left: auto;
+    padding-right: 15px;
+    padding-left: 15px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+input[type="text"],
+textarea {
+    height: auto;
+    width: 100%;
+    font-size: 1rem;
+    padding: 0.5rem;
+    box-sizing: border-box;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    font-size: 1.25rem;
+    line-height: 1.5;
+    border: 1px solid #000000;
+    border-radius: 0.1rem;
+    width: 100%;
+    cursor: pointer;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #06f;
+}
+
+.btn-small {
+    padding: .25rem .5rem;
+    font-size: .875rem;
+    line-height: 1.5;
+}
+
+.posting_form {
+    max-width: 700px;
+    padding: 0 15px 15px 15px;
+    margin: 0 auto 2rem auto;
+    box-sizing: border-box;
+}
