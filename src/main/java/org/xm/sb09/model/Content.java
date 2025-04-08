@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,16 +27,20 @@ public class Content {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter
     @Id
+    @Column
     private Long id;
     @Getter
     @Setter
+    @Column
     private String subject;
     @Getter
     @Setter
+    @Column
     @Lob
     private String content;
     @Getter
     @Temporal(TemporalType.TIME)
+    @Column
     private Date submitTime;
     @OneToMany(mappedBy = "content", cascade = CascadeType.ALL)
     private List<ContentAttachment> uploadedFiles = new ArrayList<>();

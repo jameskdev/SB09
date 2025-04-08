@@ -1,6 +1,7 @@
 package org.xm.sb09.model.dto;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -8,11 +9,13 @@ import org.xm.sb09.model.Content;
 
 import lombok.Getter;
 
-@Getter
 public class ContentGetResponse {
     private final List<ContentDto> results;
+    @Getter
     private final HttpStatus responseCode;
+    @Getter
     private int resultSize;
+    @Getter
     private final String message;
 
     public ContentGetResponse(List<Content> results, HttpStatus responseCode, String message) {
@@ -25,5 +28,9 @@ public class ContentGetResponse {
         this.responseCode = responseCode;
         this.message = message;
         this.resultSize = results.size();
+    }
+
+    public List<ContentDto> getResults() {
+        return Collections.unmodifiableList(results);
     }
 }

@@ -1,5 +1,7 @@
 package org.xm.sb09.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +19,7 @@ import org.xm.sb09.model.dto.AccountInfoResponse;
 import org.xm.sb09.model.dto.ContentGetResponse;
 import org.xm.sb09.model.dto.ContentSubmitRequest;
 import org.xm.sb09.model.dto.ContentSubmitResponse;
+import org.xm.sb09.model.dto.ContentUpdateRequest;
 import org.xm.sb09.model.dto.ContentUpdateResponse;
 import org.xm.sb09.services.ContentService;
 
@@ -32,13 +35,13 @@ public class WebController {
     }
 
     @PostMapping("/content")
-    public ResponseEntity<ContentSubmitResponse> submitContent(@RequestPart(name = "request") ContentSubmitRequest debugRequest, @RequestPart(name = "file", required = false) MultipartFile uploadFile) {
+    public ResponseEntity<ContentSubmitResponse> submitContent(@RequestPart(name = "request") ContentSubmitRequest debugRequest, @RequestPart(name = "file", required = false) List<MultipartFile> uploadFile) {
         ContentSubmitResponse res = entityService.submitRequest(debugRequest, uploadFile);
         return new ResponseEntity<>(res, res.getResponseCode());
     }
 
     @PostMapping(path = "/content_formdata")
-    public ResponseEntity<ContentSubmitResponse> submitContentGet(@RequestPart(name = "subject") String subject, @RequestPart(name = "content") String content, @RequestPart(name = "id", required = false) Long id,  @RequestPart(name = "file", required = false) MultipartFile uploadFile) {
+    public ResponseEntity<ContentSubmitResponse> submitContentGet(@RequestPart(name = "subject") String subject, @RequestPart(name = "content") String content, @RequestPart(name = "id", required = false) Long id,  @RequestPart(name = "file", required = false) List<MultipartFile> uploadFile) {
         ContentSubmitResponse res = entityService.submitRequest(new ContentSubmitRequest(subject, content, id), uploadFile);
         return new ResponseEntity<>(res, res.getResponseCode());
     }
@@ -68,7 +71,7 @@ public class WebController {
     }
 
     @PutMapping("/content/{id}")
-    public ResponseEntity<ContentUpdateResponse> updateContent(@PathVariable(name="id") Long searchById, @RequestPart(name = "request") ContentSubmitRequest request) {
+    public ResponseEntity<ContentUpdateResponse> updateContent(@PathVariable(name="id") Long searchById, @RequestPart(name = "request") ContentUpdateRequest request) {
         ContentUpdateResponse res = entityService.updateEntity(searchById, request);
         return new ResponseEntity<>(res, res.getResponseCode());
     }

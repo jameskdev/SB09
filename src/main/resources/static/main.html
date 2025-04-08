@@ -12,20 +12,29 @@
       <label for="content">Contents:</label><br>
       <textarea id="content" name="content" rows="15" cols="50"></textarea>
       <br>
-      <input type="file" id="file" name="file">
       <br>
-      <input  class="btn btn-primary" type="submit" value="Submit">
+      <input type="file" id="file" name="file" multiple="true">
+      <br>
+      <br>
+      <input class="btn btn-primary" type="submit" value="Submit">
     </form>
-    <button  class="btn" id="submit_json">Click to submit</button>
+    <br>
+    <br>
+    <button class="btn btn-primary" id="submit_json">Click to submit</button>
     <script> 
+        let attachment_file = null;
+        document.getElementById("file").addEventListener("change", (ev) => {
+            attachment_file = ev.target.files;
+        })
         document.getElementById("submit_json").addEventListener("click", (ev) => {
             const submitData = new FormData();
             const request = JSON.stringify({
                 subject : document.getElementById("subject").value,
-                content : document.getElementById("content").value
+                content : document.getElementById("content").value,
             });
             submitData.append("request", new Blob([request], { type: 'application/json' }));
-            fetch("/content", { method: "POST", body: submitData, redirect: "follow" });
+            submitData.append("file", new Blob([attachment_file], { type: 'multipart/form-data' }));
+            fetch("/content", { method: "POST", body: submitData, redirect: "follow" }).then(x => { x.json().then(y => { window.location.replace("/content/" + y.id) }) })
         });
     </script>
     <link rel="stylesheet" type="text/css" href="main-ui.css"/>

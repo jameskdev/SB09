@@ -12,6 +12,7 @@ import org.xm.sb09.model.Account;
 import org.xm.sb09.model.Content;
 import org.xm.sb09.model.ContentAttachment;
 import org.xm.sb09.model.dto.ContentSubmitResponse;
+import org.xm.sb09.model.dto.ContentUpdateRequest;
 import org.xm.sb09.model.dto.ContentUpdateResponse;
 import org.xm.sb09.model.dto.AccountCreationResponse;
 import org.xm.sb09.model.dto.AccountDto;
@@ -40,11 +41,11 @@ public class ContentService {
         Content saved = new Content(request.getSubject(), request.getContent());
         saved.setUploadedBy(acc.get());
         saved = entityRepository.save(saved);
-        return new ContentSubmitResponse(String.valueOf(saved.getId()), String.valueOf(saved.getSubmitTime()), HttpStatus.ACCEPTED);
+        return new ContentSubmitResponse(String.valueOf(saved.getId()), String.valueOf(saved.getSubmitTime()), HttpStatus.CREATED);
     }
 
-    public ContentSubmitResponse submitRequest(ContentSubmitRequest request, MultipartFile attachedFile) {
-        if (attachedFile == null || attachedFile.isEmpty()) {
+    public ContentSubmitResponse submitRequest(ContentSubmitRequest request, List<MultipartFile> attachedFiles) {
+        if (attachedFiles == null || attachedFiles.isEmpty()) {
             return submitRequest(request);
         }
         try {
@@ -53,10 +54,12 @@ public class ContentService {
                 return new ContentSubmitResponse("request_failed_invalid_account", new Date().toString(), HttpStatus.FORBIDDEN);
             }
             Content saved = new Content(request.getSubject(), request.getContent());
-            saved.addFile(new ContentAttachment(saved, attachedFile.getBytes()));
+            for (MultipartFile attachedFile: attachedFiles) {
+                saved.addFile(new ContentAttachment(saved, attachedFile.getBytes()));
+            }
             saved.setUploadedBy(acc.get());
             saved = entityRepository.save(saved);
-            return new ContentSubmitResponse(String.valueOf(saved.getId()), String.valueOf(saved.getSubmitTime()), HttpStatus.ACCEPTED);
+            return new ContentSubmitResponse(String.valueOf(saved.getId()), String.valueOf(saved.getSubmitTime()), HttpStatus.CREATED);
         } catch (IOException io) {
             return new ContentSubmitResponse("request_failed", String.valueOf(new Date()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -75,7 +78,7 @@ public class ContentService {
             return new AccountCreationResponse(null, HttpStatus.BAD_REQUEST, "The account identifier already exists!");
         }
         Account createdAccount = createNewAccount(displayName, identifier);
-        return new AccountCreationResponse(new AccountDto(createdAccount.getId(), createdAccount.getDisplayName(), createdAccount.getIdentifier()), HttpStatus.ACCEPTED, "Account created!");
+        return new AccountCreationResponse(new AccountDto(createdAccount.getId(), createdAccount.getDisplayName(), createdAccount.getIdentifier()), HttpStatus.CREATED, "Account created!");
     }
 
     public Account createNewAccount(String displayName, String identifier) {
@@ -126,7 +129,12 @@ public class ContentService {
         }
     }
 
-    public ContentUpdateResponse updateEntity(Long id, ContentSubmitRequest req) {
+    public ContentUpdateResponse purgeEntityRepository() {
+        entityRepository.deleteAll();
+        return new ContentUpdateResponse("", HttpStatus.OK, "Database emptied.");
+    }
+
+    public ContentUpdateResponse updateEntity(Long id, ContentUpdateRequest req) {
         Optional<Content> res = entityRepository.findById(id);
         if (res.isEmpty()) {
             return new ContentUpdateResponse(String.valueOf(id), HttpStatus.NOT_FOUND, "The item to update was not found!");
