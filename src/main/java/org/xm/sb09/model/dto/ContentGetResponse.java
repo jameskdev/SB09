@@ -21,7 +21,7 @@ public class ContentGetResponse {
     public ContentGetResponse(List<Content> results, HttpStatus responseCode, String message) {
         this.results = new ArrayList<>();
         results.forEach(x -> {
-            ContentDto c = new ContentDto(x.getId(), x.getSubject(), x.getContent(), new AccountDto(x.getUploadedBy().getId(), x.getUploadedBy().getDisplayName(), x.getUploadedBy().getIdentifier()), x.getSubmitTime());
+            ContentDto c = new ContentDto(x.getId(), x.getSubject(), x.getContent(), new AccountDto(x.getUploadedBy().getId(), x.getUploadedBy().getDisplayName(), x.getUploadedBy().getIdentifier()), x.getSubmitTime(), x.getLastModifiedDate());
             x.getUploadedFiles().forEach(a -> c.addAttachment(new ContentAttachmentDto(a.getId(), a.getAttachmentFile())));
             this.results.add(c);
         });

@@ -37,7 +37,8 @@ public class WebTLController {
             .id(cnt.getId())
             .subject(cnt.getSubject())
             .content(cnt.getContent())
-            .uploadedDate(cnt.getUploadedDate().toString())
+            .uploadedDate(cnt.getUploadedDate())
+            .lastModifiedDate(cnt.getLastModifiedDate())
             .uploader(cnt.getUploadedBy().getDisplayName())
             .build();
 
@@ -61,7 +62,8 @@ public class WebTLController {
                 .id(cnt.getId())
                 .subject(cnt.getSubject())
                 .content(cnt.getContent())
-                .uploadedDate(cnt.getUploadedDate().toString())
+                .uploadedDate(cnt.getUploadedDate())
+                .lastModifiedDate(cnt.getLastModifiedDate())
                 .uploader(cnt.getUploadedBy().getDisplayName())
                 .build();
             cnt.getAttachments().forEach(x -> tlDto.addAttachmentId(x.getId()));

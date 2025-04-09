@@ -19,7 +19,7 @@
                 <div class="card-body">
                     <h5 class="card-title" th:text="*{content.subject}" ></h5> <!-- item의 title 출력-->
                     <p class="card-text" th:text="*{content.content}"></p> <!-- item의 content 출력-->
-                    <a href="/posts/*{content.id}" class="btn btn-primary">보러가기</a>
+                    <a th:href="@{/posts/{id}(id=${content.id})}" class="btn btn-primary">보러가기</a>
                 </div>
             </div>
             <br>

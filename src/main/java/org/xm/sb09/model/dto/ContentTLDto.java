@@ -1,5 +1,6 @@
 package org.xm.sb09.model.dto;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -17,16 +18,19 @@ public class ContentTLDto {
     @Getter
     private final String uploader;
     @Getter
-    private final String uploadedDate;
+    private final LocalDateTime uploadedDate;
+    @Getter
+    private final LocalDateTime lastModifiedDate;
     private final List<Long> attachmentList;
 
     @Builder
-    public ContentTLDto(Long id, String subject, String content, String uploader, String uploadedDate) {
+    public ContentTLDto(Long id, String subject, String content, String uploader, LocalDateTime uploadedDate, LocalDateTime lastModifiedDate) {
         this.id = id;
         this.subject = subject;
         this.content = content;
         this.uploader = uploader;
         this.uploadedDate = uploadedDate;
+        this.lastModifiedDate = lastModifiedDate;
         this.attachmentList = new ArrayList<>();
     }
 

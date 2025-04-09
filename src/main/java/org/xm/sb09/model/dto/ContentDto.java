@@ -1,8 +1,8 @@
 package org.xm.sb09.model.dto;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import lombok.Getter;
@@ -20,7 +20,9 @@ public class ContentDto {
     @Getter
     private final AccountDto uploadedBy;
     @Getter
-    private final Date uploadedDate;
+    private final LocalDateTime uploadedDate;
+    @Getter
+    private final LocalDateTime lastModifiedDate;
     private final List<ContentAttachmentDto> attachments = new ArrayList<>();
 
     public List<ContentAttachmentDto> getAttachments() {
