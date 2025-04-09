@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+ <html lang="en">
+ <head>
+   <meta charset="UTF-8">
+   <title>Blog Post</title>
+ </head>
+ <body>
+    <h1 th:text="*{contentdto.subject}">글을 불러올 수 없었습니다</h1>
+    <p th:text="${#temporals.format(today, 'yyyy-MM-dd')}"></p>
+        <div th:object="${contentdto}">
+            <p th:text="|글 내용 : *{content}|"></p>
+            <p th:text="|글쓴이 : *{uploader}|"></p>
+            <p th:text="|올린 날짜 : *{uploadedDate}|"></p>
+            <p>첨부파일 목록:</p>
+            <ul th:each="attachment : *{attachmentList}">
+                <li th:text="${attachment}"></li>
+                <a th:href="@{/content/attachment/{id}(id=${attachment})}">다운로드</a>
+            </ul>
+            <br>
+            <button id="delete">삭제</button>
+        </div>
+    <script>
+        document.getElementById("delete").addEventListener("click", (ev) => {
+            fetch("/content/[[${contentdto.id}]]", { method: "DELETE" }).then(y => { y.json().then(sd => { window.location.replace("/main.html") }) });
+        })
+    </script>
+ </body>
+ </html>

@@ -134,6 +134,7 @@ public class ContentService {
         return new ContentUpdateResponse("", HttpStatus.OK, "Database emptied.");
     }
 
+    // @Transactional
     public ContentUpdateResponse updateEntity(Long id, ContentUpdateRequest req) {
         Optional<Content> res = entityRepository.findById(id);
         if (res.isEmpty()) {

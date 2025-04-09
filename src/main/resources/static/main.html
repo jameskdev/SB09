@@ -5,36 +5,30 @@
     <title>Content Submission Page</title>
 </head>
 <body>
-    <h1 class="posting_form">Submit your content</h1><br>
-    <form action="/content_formdata" class="posting_form" enctype="multipart/form-data" method="POST">
-      <label for="subject">Subject:</label>
-      <input type="text" id="subject" name="subject"><br><br>
-      <label for="content">Contents:</label><br>
-      <textarea id="content" name="content" rows="15" cols="50"></textarea>
-      <br>
-      <br>
-      <input type="file" id="file" name="file" multiple="true">
-      <br>
-      <br>
-      <input class="btn btn-primary" type="submit" value="Submit">
-    </form>
-    <br>
-    <br>
-    <button class="btn btn-primary" id="submit_json">Click to submit</button>
+    <div class="posting_form">
+        <h1>Submit your content</h1><br>
+        <label for="subject">Subject:</label>
+        <input type="text" id="subject" name="subject"><br><br>
+        <label for="content">Contents:</label><br>
+        <textarea id="content" name="content" rows="15" cols="50"></textarea>
+        <br>
+        <br>
+        <form id="content_submit_form" enctype="multipart/form-data">
+            <input type="file" id="file" name="file" multiple="true">
+        </form>
+        <br>
+        <br>
+        <button class="btn btn-primary" id="submit_json">Click to submit</button>
+    </div>
     <script> 
-        let attachment_file = null;
-        document.getElementById("file").addEventListener("change", (ev) => {
-            attachment_file = ev.target.files;
-        })
         document.getElementById("submit_json").addEventListener("click", (ev) => {
-            const submitData = new FormData();
+            const submitData = new FormData(document.getElementById("content_submit_form"));
             const request = JSON.stringify({
                 subject : document.getElementById("subject").value,
                 content : document.getElementById("content").value,
             });
             submitData.append("request", new Blob([request], { type: 'application/json' }));
-            submitData.append("file", new Blob([attachment_file], { type: 'multipart/form-data' }));
-            fetch("/content", { method: "POST", body: submitData, redirect: "follow" }).then(x => { x.json().then(y => { window.location.replace("/content/" + y.id) }) })
+            fetch("/content", { method: "POST", body: submitData }).then(x => { x.json().then(y => { window.location.replace("/posts/" + y.id) }) })
         });
     </script>
     <link rel="stylesheet" type="text/css" href="main-ui.css"/>
