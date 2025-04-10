@@ -18,11 +18,17 @@
             </ul>
             <br>
             <button id="delete">삭제</button>
+            <br>
+            <button id="edit">수정</button>
+            <br>
             <a href="/posts/all">목록으로 돌아가기</a>
         </div>
     <script>
         document.getElementById("delete").addEventListener("click", (ev) => {
             fetch("/content/[[${contentdto.id}]]", { method: "DELETE" }).then(y => { y.json().then(sd => { window.location.replace("/posts/all") }) });
+        })
+        document.getElementById("edit").addEventListener("click", (ev) => {
+            window.location.replace("/edit-post?id=[[${contentdto.id}]]");
         })
     </script>
  </body>

@@ -12,6 +12,7 @@
     </div>
     
     <div class="container">
+        <button id="add-post" class="btn btn-secondary btn-sm mb-3" >새로운 글</button>
         <div class="row-6" th:each="content : *{cntdtolist}">  <!-- articles 갯수 만큼 반복, item 변수로 지정 -->
             <div class="card">
                 <div class="card-header" th:text="*{content.id}"></div>  <!-- item의 id 출력-->
@@ -25,5 +26,10 @@
             <br>
         </div>
     </div>
+    <script>
+        document.getElementById("add-post").addEventListener("click", (ev) => {
+            window.location.replace("/edit-post");
+        })
+    </script>
  </body>
  </html>

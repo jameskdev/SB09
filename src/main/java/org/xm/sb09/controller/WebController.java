@@ -71,7 +71,7 @@ public class WebController {
     }
 
     @PutMapping("/content/{id}")
-    public ResponseEntity<ContentUpdateResponse> updateContent(@PathVariable(name="id") Long searchById, @RequestPart(name = "request") ContentUpdateRequest request) {
+    public ResponseEntity<ContentUpdateResponse> updateContent(@PathVariable(name="id") Long searchById, @RequestPart(name = "request") ContentUpdateRequest request, @RequestPart(name = "file", required = false) List<MultipartFile> uploadFile) {
         ContentUpdateResponse res = entityService.updateEntity(searchById, request);
         return new ResponseEntity<>(res, res.getResponseCode());
     }

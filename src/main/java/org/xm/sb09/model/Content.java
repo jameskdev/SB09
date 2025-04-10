@@ -21,7 +21,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.Builder;
@@ -42,7 +41,7 @@ public class Content {
     private String subject;
     @Getter
     @Setter
-    @Column
+    @Column(columnDefinition = "LONGTEXT")
     @Lob
     private String content;
     @Getter

@@ -52,9 +52,9 @@ public class WebTLController {
     @GetMapping("/posts/all")
     public String getAllPosts(Model model) {
         ContentGetResponse res = service.getAllEntities();
-        if (res.getResponseCode() != HttpStatus.OK) {
-            return "error-page";
-        }
+        //if (res.getResponseCode() != HttpStatus.OK) {
+        //    return "error-page";
+        //}
         List<ContentDto> cntList = res.getResults();
         List<ContentTLDto> cntDtoList = new ArrayList<>();
         cntList.forEach(cnt -> {
@@ -74,5 +74,29 @@ public class WebTLController {
  
         return "all-contents";
     }
-        
+
+    @GetMapping("/edit-post")
+    public String editPost(@RequestParam(name = "id", required = false) Long id, Model model) {
+        if (id == null) {
+            model.addAttribute("cntdto", ContentTLDto.builder().build());
+            return "edit-post";
+        } else {
+            ContentGetResponse res = service.getEntityById(id);
+            if (res.getResponseCode() != HttpStatus.OK) {
+                return "error-page";
+            }
+            ContentDto cnt = res.getResults().getFirst();
+            ContentTLDto content =
+            ContentTLDto.builder()
+                .id(cnt.getId())
+                .subject(cnt.getSubject())
+                .content(cnt.getContent())
+                .uploadedDate(cnt.getUploadedDate())
+                .lastModifiedDate(cnt.getLastModifiedDate())
+                .uploader(cnt.getUploadedBy().getDisplayName())
+                .build();
+            model.addAttribute("cntdto", content);
+            return "edit-post";
+        }
+    }
 }
