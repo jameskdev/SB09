@@ -48,6 +48,12 @@ public class WebController {
         return new ResponseEntity<>(res, res.getResponseCode());
     }
 
+    @PutMapping("/comment")
+    public ResponseEntity<CommentUpdateResponse> editComment(@RequestBody CommentEditRequest request) {
+        CommentUpdateResponse res = commentService.editComment(request);
+        return new ResponseEntity<>(res, res.getResponseCode());
+    }
+
     @DeleteMapping("/comment")
     public ResponseEntity<CommentUpdateResponse> deleteComment(@RequestBody CommentDeleteRequest request) {
         CommentUpdateResponse res = commentService.deleteComment(request);

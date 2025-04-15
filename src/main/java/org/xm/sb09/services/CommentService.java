@@ -14,6 +14,7 @@ import org.xm.sb09.model.Content;
 import org.xm.sb09.model.dto.CommentAnonymousPostRequest;
 import org.xm.sb09.model.dto.CommentDeleteRequest;
 import org.xm.sb09.model.dto.CommentDto;
+import org.xm.sb09.model.dto.CommentEditRequest;
 import org.xm.sb09.model.dto.CommentGetResponse;
 import org.xm.sb09.model.dto.CommentPostRequest;
 import org.xm.sb09.model.dto.CommentPostResponse;
@@ -78,6 +79,44 @@ public class CommentService {
         return new CommentPostResponse(CommentDto.fromEntity(c), "Comment post successful", HttpStatus.CREATED);
     }
 
+    public CommentUpdateResponse editComment(CommentEditRequest request) {
+        Optional<Comment> commentQuery = commentRepository.findById(request.getCommentId());
+        if (commentQuery.isEmpty()) {
+            return new CommentUpdateResponse(-1L, 
+                "You are trying to edit a non-existing comment: " + request.getCommentId(),
+                HttpStatus.NOT_FOUND);
+        }
+        Comment c = commentQuery.get();
+        if (c.getUploader() != null) {
+            Authentication authInfo = SecurityContextHolder.getContext().getAuthentication();
+            if (authInfo.isAuthenticated()) {
+                if (authInfo.getPrincipal() instanceof Account p) {
+                    if (p.getId() == c.getUploader().getId()) {
+                        c.changeContent(request.getContent());
+                        commentRepository.save(c);
+                        return new CommentUpdateResponse(c.getId(), "Comment successfully edited", HttpStatus.OK);
+                    } else {
+                        return new CommentUpdateResponse(c.getId(), "You are attempting to edit a comment posted by another user!",  HttpStatus.UNAUTHORIZED);
+                    }
+                } else {
+                    return new CommentUpdateResponse(-1L, 
+                        "An internal server error occurred while editing the comment! (Invalid account data in context)",
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            } else {
+                return new CommentUpdateResponse(c.getId(), "You are attempting to edit a comment posted by a member without logging in!",  HttpStatus.UNAUTHORIZED);
+            }
+        } else {
+            if (encoder.matches(request.getPassword(), c.getEditPassword())) {
+                c.changeContent(request.getContent());
+                commentRepository.save(c);
+                return new CommentUpdateResponse(c.getId(), "Comment successfully edited", HttpStatus.OK);
+            } else {
+                return new CommentUpdateResponse(c.getId(), "The password that you provided did not match with the password set for this comment!",  HttpStatus.UNAUTHORIZED);
+            }
+        }
+    }
+
     public CommentUpdateResponse deleteComment(CommentDeleteRequest request) {
         Optional<Comment> commentQuery = commentRepository.findById(request.getCommentId());
         if (commentQuery.isEmpty()) {
@@ -98,7 +137,7 @@ public class CommentService {
                     }
                 } else {
                     return new CommentUpdateResponse(-1L, 
-                        "An internal server error occurred while saving the comment! (Invalid account data in context)",
+                        "An internal server error occurred while deleting the comment! (Invalid account data in context)",
                         HttpStatus.INTERNAL_SERVER_ERROR);
                 }
             } else {
