@@ -154,20 +154,19 @@ public class CommentService {
     }
 
     public CommentPostResponse postComment(CommentPostRequest request) {
-        boolean loggedIn = SecurityContextHolder.getContext().getAuthentication().isAuthenticated();
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Authentication authInfo = SecurityContextHolder.getContext().getAuthentication();
         Optional<Content> contentQuery = contentRepository.findById(request.getPostId());
         if (contentQuery.isEmpty()) {
             return new CommentPostResponse(null, 
                 "You are trying to comment on a non-existing content: " + request.getPostId(),
                 HttpStatus.NOT_FOUND);
         }
-        if (!loggedIn) {
+        if (authInfo.isAuthenticated()) {
             return new CommentPostResponse(null, 
                 "You are attempting to post a comment as a registered user without logging in! Please post as an anonymous user.",
                 HttpStatus.FORBIDDEN);
         }
-        if (principal instanceof Account p) {
+        if (authInfo.getPrincipal() instanceof Account p) {
             Comment c = commentRepository.save(Comment.builder().
                 uploader(p).
                 content(request.getContent()).

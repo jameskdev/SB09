@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
-import org.xm.sb09.services.AccountDetailsService;
 
 import lombok.AllArgsConstructor;
 
@@ -20,7 +19,7 @@ public class WebSecurityConfiguration {
     @Bean
     public WebSecurityCustomizer configure() {
         return web -> web.ignoring()
-                .requestMatchers("/static/**").requestMatchers("/test**");
+                .requestMatchers("/static/**");
     }
 
     
@@ -28,7 +27,6 @@ public class WebSecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(auth ->              // 인증,인가 설정
                         auth.requestMatchers("/login", "/register", "/account").permitAll()
-                                .requestMatchers(RegexRequestMatcher.regexMatcher(HttpMethod.GET, "/edit-post")).permitAll()
                                 .requestMatchers(RegexRequestMatcher.regexMatcher(HttpMethod.GET, "/posts/.*")).permitAll()
                                 .requestMatchers(RegexRequestMatcher.regexMatcher(HttpMethod.GET, "/test.*")).permitAll()
                                 //.requestMatchers("edit-post").hasRole("ADMIN")

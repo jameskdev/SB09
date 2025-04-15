@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,35 +32,29 @@ public class ContentService {
         this.accountRepository = accountRepository;
     }
 
-    /*
-    public ContentSubmitResponse submitRequest(ContentSubmitRequest request) {
-        Optional<Account> acc = accountRepository.findById(request.getId());
-        if (acc.isEmpty()) {
-            return new ContentSubmitResponse("request_failed_invalid_account", new Date().toString(), HttpStatus.FORBIDDEN);
-        }
-        Content saved = new Content(request.getSubject(), request.getContent());
-        saved.setUploadedBy(acc.get());
-        saved = entityRepository.save(saved);
-        return new ContentSubmitResponse(String.valueOf(saved.getId()), String.valueOf(saved.getSubmitTime()), HttpStatus.CREATED);
-    }
-*/
-
     public ContentSubmitResponse submitRequest(ContentSubmitRequest request, List<MultipartFile> attachedFiles) {
-        boolean loggedIn = SecurityContextHolder.getContext().getAuthentication().isAuthenticated();
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        
+        Authentication authInfo = SecurityContextHolder.getContext().getAuthentication();
         try {
             Content saved = new Content(request.getSubject(), request.getContent());
             for (MultipartFile attachedFile: attachedFiles) {
                 saved.addFile(new ContentAttachment(saved, attachedFile.getBytes()));
             }
-            if (principal instanceof Account p) {
-                saved.setUploadedBy(p);
+            if (authInfo.isAuthenticated()) {
+                if (authInfo.getPrincipal() instanceof Account p) {
+                    saved.setUploadedBy(p);
+                    saved = entityRepository.save(saved);
+                    return new ContentSubmitResponse(String.valueOf(saved.getId()), String.valueOf(saved.getSubmitTime()), HttpStatus.CREATED);
+                } else {
+                    return new ContentSubmitResponse("invalid_authorization_context", String.valueOf(new Date()), HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            } else {
+                // In order to allow anonymous contents, this needs to be changed.
+                return new ContentSubmitResponse("not_logged_in", String.valueOf(new Date()), HttpStatus.FORBIDDEN);
             }
-            saved = entityRepository.save(saved);
-            return new ContentSubmitResponse(String.valueOf(saved.getId()), String.valueOf(saved.getSubmitTime()), HttpStatus.CREATED);
         } catch (IOException io) {
-            return new ContentSubmitResponse("request_failed", String.valueOf(new Date()), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ContentSubmitResponse("request_failed_io_error", String.valueOf(new Date()), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (IllegalArgumentException io) {
+            return new ContentSubmitResponse("request_failed_illegal_argument", String.valueOf(new Date()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -100,10 +95,33 @@ public class ContentService {
 
     public ContentUpdateResponse deleteEntity(Long id) {
         try {
-            entityRepository.deleteById(id);
-            return new ContentUpdateResponse(String.valueOf(id), HttpStatus.OK, "Delete successful.");
+            Authentication authInfo = SecurityContextHolder.getContext().getAuthentication();
+            Optional<Content> contentQuery = entityRepository.findById(id);
+            if (contentQuery.isEmpty()) {
+                return new ContentUpdateResponse(String.valueOf(id), HttpStatus.NOT_FOUND, "The item to delete was not found!");
+            }
+            Content c = contentQuery.get();
+            if (c.getUploadedBy() != null) {
+                if (authInfo.isAuthenticated()) {
+                    if (authInfo.getPrincipal() instanceof Account p) {
+                        if (c.getUploadedBy().getId() == p.getId()) {
+                            entityRepository.deleteById(id);
+                            return new ContentUpdateResponse(String.valueOf(id), HttpStatus.OK, "Delete successful.");
+                        } else {
+                            return new ContentUpdateResponse(String.valueOf(id), HttpStatus.FORBIDDEN, "You are trying to delete a content posted by another member!.");
+                        }
+                    } else {
+                        return new ContentUpdateResponse(String.valueOf(id), HttpStatus.INTERNAL_SERVER_ERROR, "Invalid authorization context information!.");
+                    }
+                } else {
+                    return new ContentUpdateResponse(String.valueOf(id), HttpStatus.FORBIDDEN, "You are trying to delete a content posted by a member without logging in!.");
+                }
+            } else {
+                return new ContentUpdateResponse(String.valueOf(id), HttpStatus.INTERNAL_SERVER_ERROR, "The content's uploader information is null!.");
+                // TBD: Needs to be changed in order to allow anonymous contents.
+            }
         } catch (IllegalArgumentException ex) {
-            return new ContentUpdateResponse(String.valueOf(id), HttpStatus.NOT_FOUND, "The item to delete was not found!");
+            return new ContentUpdateResponse(String.valueOf(id), HttpStatus.INTERNAL_SERVER_ERROR, "An exception occurred while deleting the item!");
         }
     }
 
@@ -114,18 +132,36 @@ public class ContentService {
 
     // @Transactional
     public ContentUpdateResponse updateEntity(Long id, ContentUpdateRequest req) {
-        Optional<Content> res = entityRepository.findById(id);
-        if (res.isEmpty()) {
-            return new ContentUpdateResponse(String.valueOf(id), HttpStatus.NOT_FOUND, "The item to update was not found!");
-        }
-        Content cnt = res.get();
         try {
-            cnt.setSubject(req.getSubject());
-            cnt.setContent(req.getContent());
-            entityRepository.save(cnt);
-            return new ContentUpdateResponse(String.valueOf(id), HttpStatus.OK, "Update successful for the content ID: " + id);
+            Authentication authInfo = SecurityContextHolder.getContext().getAuthentication();
+            Optional<Content> contentQuery = entityRepository.findById(id);
+            if (contentQuery.isEmpty()) {
+                return new ContentUpdateResponse(String.valueOf(id), HttpStatus.NOT_FOUND, "The item to update was not found!");
+            }
+            Content c = contentQuery.get();
+            if (c.getUploadedBy() != null) {
+                if (authInfo.isAuthenticated()) {
+                    if (authInfo.getPrincipal() instanceof Account p) {
+                        if (c.getUploadedBy().getId() == p.getId()) {
+                            c.setSubject(req.getSubject());
+                            c.setContent(req.getContent());
+                            entityRepository.save(c);
+                            return new ContentUpdateResponse(String.valueOf(id), HttpStatus.OK, "Update successful for the content ID: " + id);
+                        } else {
+                            return new ContentUpdateResponse(String.valueOf(id), HttpStatus.FORBIDDEN, "You are trying to update a content posted by another member!.");
+                        }
+                    } else {
+                        return new ContentUpdateResponse(String.valueOf(id), HttpStatus.INTERNAL_SERVER_ERROR, "Invalid authorization context information!.");
+                    }
+                } else {
+                    return new ContentUpdateResponse(String.valueOf(id), HttpStatus.FORBIDDEN, "You are trying to update a content posted by a member without logging in!.");
+                }
+            } else {
+                return new ContentUpdateResponse(String.valueOf(id), HttpStatus.INTERNAL_SERVER_ERROR, "The content's uploader information is null!.");
+                // TBD: Needs to be changed in order to allow anonymous contents.
+            }
         } catch (IllegalArgumentException ex) {
-            return new ContentUpdateResponse(String.valueOf(id), HttpStatus.NOT_FOUND, "The item to update(" + id + ") was not found!");
+            return new ContentUpdateResponse(String.valueOf(id), HttpStatus.INTERNAL_SERVER_ERROR, "An exception occurred while updating the item!");
         }
     }
     

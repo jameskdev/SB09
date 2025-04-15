@@ -4,7 +4,6 @@ import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.annotation.CreatedDate;
@@ -54,9 +53,13 @@ public class Content {
     @Temporal(TemporalType.TIMESTAMP)
     @Column
     private LocalDateTime lastModifiedDate;
+    // When a content is gone, so are all the comments (for good)
+    @OneToMany(mappedBy = "postContent", cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
     @OneToMany(mappedBy = "content", cascade = CascadeType.ALL)
     private List<ContentAttachment> uploadedFiles = new ArrayList<>();
-    @ManyToOne(optional = true)
+    // TBD: Needs to be changed in order to allow anonymous contents.
+    @ManyToOne(optional = false)
     private Account uploadedBy;
 
     protected Content() {
@@ -88,6 +91,10 @@ public class Content {
 
     public List<ContentAttachment> getUploadedFiles() {
         return Collections.unmodifiableList(uploadedFiles);
+    }
+
+    public List<Comment> getComments() {
+        return Collections.unmodifiableList(comments);
     }
 
 
