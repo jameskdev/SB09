@@ -56,7 +56,7 @@ public class Content {
     private LocalDateTime lastModifiedDate;
     @OneToMany(mappedBy = "content", cascade = CascadeType.ALL)
     private List<ContentAttachment> uploadedFiles = new ArrayList<>();
-    @ManyToOne
+    @ManyToOne(optional = true)
     private Account uploadedBy;
 
     protected Content() {

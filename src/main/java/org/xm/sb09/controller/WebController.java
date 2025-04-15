@@ -13,14 +13,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.xm.sb09.model.dto.AccountCreationRequest;
-import org.xm.sb09.model.dto.AccountCreationResponse;
 import org.xm.sb09.model.dto.AccountInfoResponse;
+import org.xm.sb09.model.dto.CommentAnonymousPostRequest;
+import org.xm.sb09.model.dto.CommentDeleteRequest;
+import org.xm.sb09.model.dto.CommentEditRequest;
+import org.xm.sb09.model.dto.CommentGetResponse;
+import org.xm.sb09.model.dto.CommentPostRequest;
+import org.xm.sb09.model.dto.CommentPostResponse;
+import org.xm.sb09.model.dto.CommentUpdateResponse;
 import org.xm.sb09.model.dto.ContentGetResponse;
 import org.xm.sb09.model.dto.ContentSubmitRequest;
 import org.xm.sb09.model.dto.ContentSubmitResponse;
 import org.xm.sb09.model.dto.ContentUpdateRequest;
 import org.xm.sb09.model.dto.ContentUpdateResponse;
+import org.xm.sb09.services.CommentService;
 import org.xm.sb09.services.ContentService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -29,9 +35,41 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class WebController {
     private final ContentService entityService;
+    private final CommentService commentService;
 
-    public WebController(ContentService entityService) {
+    public WebController(ContentService entityService, CommentService commentService) {
         this.entityService = entityService;
+        this.commentService = commentService;
+    }
+
+    @PostMapping("/comment")
+    public ResponseEntity<CommentPostResponse> postComment(@RequestBody CommentPostRequest request) {
+        CommentPostResponse res = commentService.postComment(request);
+        return new ResponseEntity<>(res, res.getResponseCode());
+    }
+
+    @DeleteMapping("/comment")
+    public ResponseEntity<CommentUpdateResponse> deleteComment(@RequestBody CommentDeleteRequest request) {
+        CommentUpdateResponse res = commentService.deleteComment(request);
+        return new ResponseEntity<>(res, res.getResponseCode());
+    }
+
+    @PostMapping("/comment/anonymous")
+    public ResponseEntity<CommentPostResponse> postAnonymousComment(@RequestBody CommentAnonymousPostRequest request) {
+        CommentPostResponse res = commentService.postAnonymousComment(request);
+        return new ResponseEntity<>(res, res.getResponseCode());
+    }
+
+    @GetMapping("/comment/content/{id}")
+    public ResponseEntity<CommentGetResponse> getCommentsForContent(@PathVariable(name="id") Long contentId) {
+        CommentGetResponse res = commentService.getCommentsForContent(contentId);
+        return new ResponseEntity<>(res, res.getResponseCode());
+    }
+
+    @GetMapping("/comment/user/{id}")
+    public ResponseEntity<CommentGetResponse> getCommentsByUser(@PathVariable(name="id") Long userId) {
+        CommentGetResponse res = commentService.getCommentsByUser(userId);
+        return new ResponseEntity<>(res, res.getResponseCode());
     }
 
     @PostMapping("/content")
@@ -49,12 +87,6 @@ public class WebController {
     @GetMapping("/content/{id}")
     public ResponseEntity<ContentGetResponse> getStoredContent(@PathVariable(name="id") Long searchById) {
         ContentGetResponse res = entityService.getEntityById(searchById);
-        return new ResponseEntity<>(res, res.getResponseCode());
-    }
-
-    @PostMapping("/account")
-    public ResponseEntity<AccountCreationResponse> createAccount(@RequestBody AccountCreationRequest request) {
-        AccountCreationResponse res = entityService.handleAccountCreationRequest(request.getDisplayName(), request.getIdentifier());
         return new ResponseEntity<>(res, res.getResponseCode());
     }
 

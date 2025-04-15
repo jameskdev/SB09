@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.xm.sb09.model.Account;
@@ -14,8 +15,6 @@ import org.xm.sb09.model.ContentAttachment;
 import org.xm.sb09.model.dto.ContentSubmitResponse;
 import org.xm.sb09.model.dto.ContentUpdateRequest;
 import org.xm.sb09.model.dto.ContentUpdateResponse;
-import org.xm.sb09.model.dto.AccountCreationResponse;
-import org.xm.sb09.model.dto.AccountDto;
 import org.xm.sb09.model.dto.AccountInfoResponse;
 import org.xm.sb09.model.dto.ContentGetResponse;
 import org.xm.sb09.model.dto.ContentSubmitRequest;
@@ -30,9 +29,9 @@ public class ContentService {
     public ContentService(ContentRepository entityRepository, AccountRepository accountRepository) {
         this.entityRepository = entityRepository;
         this.accountRepository = accountRepository;
-        accountRepository.save(new Account("00000000", "Anonymous"));
     }
 
+    /*
     public ContentSubmitResponse submitRequest(ContentSubmitRequest request) {
         Optional<Account> acc = accountRepository.findById(request.getId());
         if (acc.isEmpty()) {
@@ -43,46 +42,25 @@ public class ContentService {
         saved = entityRepository.save(saved);
         return new ContentSubmitResponse(String.valueOf(saved.getId()), String.valueOf(saved.getSubmitTime()), HttpStatus.CREATED);
     }
+*/
 
     public ContentSubmitResponse submitRequest(ContentSubmitRequest request, List<MultipartFile> attachedFiles) {
-        if (attachedFiles == null || attachedFiles.isEmpty()) {
-            return submitRequest(request);
-        }
+        boolean loggedIn = SecurityContextHolder.getContext().getAuthentication().isAuthenticated();
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        
         try {
-            Optional<Account> acc = accountRepository.findById(request.getId());
-            if (acc.isEmpty()) {
-                return new ContentSubmitResponse("request_failed_invalid_account", new Date().toString(), HttpStatus.FORBIDDEN);
-            }
             Content saved = new Content(request.getSubject(), request.getContent());
             for (MultipartFile attachedFile: attachedFiles) {
                 saved.addFile(new ContentAttachment(saved, attachedFile.getBytes()));
             }
-            saved.setUploadedBy(acc.get());
+            if (principal instanceof Account p) {
+                saved.setUploadedBy(p);
+            }
             saved = entityRepository.save(saved);
             return new ContentSubmitResponse(String.valueOf(saved.getId()), String.valueOf(saved.getSubmitTime()), HttpStatus.CREATED);
         } catch (IOException io) {
             return new ContentSubmitResponse("request_failed", String.valueOf(new Date()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
-
-    public Account getAnonymousAccount() {
-        Optional<Account> anonymousAccount = accountRepository.findById(1L);
-        if (anonymousAccount.isPresent()) {
-            return anonymousAccount.get();
-        }
-        return accountRepository.save(new Account("00000000", "Anonymous"));
-    }
-
-    public AccountCreationResponse handleAccountCreationRequest(String displayName, String identifier) {
-        if (accountRepository.existsByIdentifier(identifier)) {
-            return new AccountCreationResponse(null, HttpStatus.BAD_REQUEST, "The account identifier already exists!");
-        }
-        Account createdAccount = createNewAccount(displayName, identifier);
-        return new AccountCreationResponse(new AccountDto(createdAccount.getId(), createdAccount.getDisplayName(), createdAccount.getIdentifier()), HttpStatus.CREATED, "Account created!");
-    }
-
-    public Account createNewAccount(String displayName, String identifier) {
-        return accountRepository.save(new Account(identifier, displayName));
     }
 
     public AccountInfoResponse getAccountInfo(Long id) {
