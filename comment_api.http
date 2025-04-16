@@ -1,0 +1,44 @@
+### How to post a new comment (needs to be authenticated, will throw 403 if not authenticated)
+POST http://localhost:8080/comment
+Content-Type: application/json
+
+{
+  "post_id" : "The ID of the article to post comment on",
+  "content" : "The contents of the comment to post"
+}
+
+### How to post a comment as an anonymous user (does not require anonymous)
+GET http://localhost:8080/comment/anonymous
+Content-Type: application/json
+
+{
+  "post_id" : "The ID of the article to post comment on",
+  "content" : "The contents of the comment to post",
+  "display_name" : "The nickname to display for this comment",
+  "password" : "The password that will be used to edit / delete the comment"
+}
+
+### How to get comments for a content
+GET http://localhost:8080//comment/content/{id}
+
+### How to get comments posted by a specific user
+GET http://localhost:8080//comment/user/{id}
+
+### How to delete a comment
+DELETE http://localhost:8080/comment
+Content-Type: application/json
+
+{
+  "comment_id" : "The ID(PK) of the comment to delete",
+  "password" : "The password for deleting the comment, if this comment is an anonymous comment. This is only required if the comment is anonymous."
+}
+
+### How to edit a comment
+PUT http://localhost:8080/comment
+Content-Type: application/json
+
+{
+  "comment_id" : "The ID(PK) of the comment to delete",
+  "password" : "The password for deleting the comment, if this comment is an anonymous comment. This is only required if the comment is anonymous.", 
+  "content" : "The (new) contents of the comment to post"
+}
