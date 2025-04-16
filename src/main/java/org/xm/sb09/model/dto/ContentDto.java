@@ -24,6 +24,7 @@ public class ContentDto {
     @Getter
     private final LocalDateTime lastModifiedDate;
     private final List<ContentAttachmentDto> attachments = new ArrayList<>();
+    private final List<CommentDto> comments = new ArrayList<>();
 
     public List<ContentAttachmentDto> getAttachments() {
         return Collections.unmodifiableList(attachments);
@@ -31,5 +32,9 @@ public class ContentDto {
 
     public void addAttachment(ContentAttachmentDto attachment) {
         attachments.add(attachment);
+    }
+
+    public void addComment(CommentDto comment) {
+        comments.add(comment);
     }
 }

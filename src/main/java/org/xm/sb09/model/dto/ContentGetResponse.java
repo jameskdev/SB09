@@ -23,6 +23,7 @@ public class ContentGetResponse {
         results.forEach(x -> {
             ContentDto c = new ContentDto(x.getId(), x.getSubject(), x.getContent(), new AccountDto(x.getUploadedBy().getId(), x.getUploadedBy().getDisplayName(), x.getUploadedBy().getIdentifier()), x.getSubmitTime(), x.getLastModifiedDate());
             x.getUploadedFiles().forEach(a -> c.addAttachment(new ContentAttachmentDto(a.getId(), a.getAttachmentFile())));
+            x.getComments().forEach(a -> c.addComment(CommentDto.fromEntity(a)));
             this.results.add(c);
         });
         this.responseCode = responseCode;

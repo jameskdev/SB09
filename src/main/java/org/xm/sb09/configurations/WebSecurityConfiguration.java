@@ -29,6 +29,11 @@ public class WebSecurityConfiguration {
                         auth.requestMatchers("/login", "/register", "/account").permitAll()
                                 .requestMatchers(RegexRequestMatcher.regexMatcher(HttpMethod.GET, "/posts/.*")).permitAll()
                                 .requestMatchers(RegexRequestMatcher.regexMatcher(HttpMethod.GET, "/test.*")).permitAll()
+                                .requestMatchers(RegexRequestMatcher.regexMatcher(HttpMethod.GET, "/comment.*")).permitAll()
+                                .requestMatchers(RegexRequestMatcher.regexMatcher(HttpMethod.POST, "/comment.*")).permitAll()
+                                .requestMatchers(RegexRequestMatcher.regexMatcher(HttpMethod.PUT, "/comment.*")).permitAll()
+                                .requestMatchers(RegexRequestMatcher.regexMatcher(HttpMethod.DELETE, "/comment.*")).permitAll()
+                                .requestMatchers(RegexRequestMatcher.regexMatcher(HttpMethod.GET, "/content.*")).permitAll()
                                 //.requestMatchers("edit-post").hasRole("ADMIN")
                                 .anyRequest().authenticated())
                 .formLogin(auth -> auth.loginPage("/login")     // 폼 기반 로그인 설정
