@@ -18,11 +18,17 @@ Content-Type: application/json
   "password" : "The password that will be used to edit / delete the comment"
 }
 
+### How to get all contents
+GET http://localhost:8080/all_contents
+
+### How to get a content
+GET http://localhost:8080/content/{id}
+
 ### How to get comments for a content
-GET http://localhost:8080//comment/content/{id}
+GET http://localhost:8080/comment/content/{id}
 
 ### How to get comments posted by a specific user
-GET http://localhost:8080//comment/user/{id}
+GET http://localhost:8080/comment/user/{id}
 
 ### How to delete a comment
 DELETE http://localhost:8080/comment

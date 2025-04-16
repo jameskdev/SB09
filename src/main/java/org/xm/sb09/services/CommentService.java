@@ -161,7 +161,7 @@ public class CommentService {
                 "You are trying to comment on a non-existing content: " + request.getPostId(),
                 HttpStatus.NOT_FOUND);
         }
-        if (authInfo.isAuthenticated()) {
+        if (!authInfo.isAuthenticated()) {
             return new CommentPostResponse(null, 
                 "You are attempting to post a comment as a registered user without logging in! Please post as an anonymous user.",
                 HttpStatus.FORBIDDEN);
