@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 env:
-  S3_BUCKET_NAME: xm-dev-deploy
+  S3_BUCKET_NAME: sb09dist
   AWS_REGION: ap-northeast-2
 
 jobs:
