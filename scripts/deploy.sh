@@ -22,4 +22,4 @@ fi
 
 DEPLOY_JAR=$DEPLOY_PATH$JAR_NAME
 echo "## deploy JAR file"   >> /home/ubuntu/sb09-deploy/spring-deploy.log
-nohup $JAVA_HOME/bin/java -jar $DEPLOY_JAR >> /home/ubuntu/sb09-deploy/spring-deploy.log 2> /home/ubuntu/sb09-deploy/spring-deploy_err.log &
+nohup /home/ubuntu/jdk21/bin/java -jar $DEPLOY_JAR >> /home/ubuntu/sb09-deploy/spring-deploy.log 2> /home/ubuntu/sb09-deploy/spring-deploy_err.log &
