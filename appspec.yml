@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source:  /
-    destination: /home/sb09-deploy/action
+    destination: /home/sb09-deploy
     overwrite: yes
 
 permissions:
